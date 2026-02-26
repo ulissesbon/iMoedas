@@ -25,36 +25,87 @@ struct CriarNovaOperacao: View {
     
     var formValido: Bool {
            // Verifica se não está vazio e se não é apenas espaços
-           !titulo.trimmingCharacters(in: .whitespaces).isEmpty &&
-           !descricao.trimmingCharacters(in: .whitespaces).isEmpty
+           !titulo.trimmingCharacters(in: .whitespaces).isEmpty
            && valor != 0
        }
-
+    
+    struct OutlinedTextFieldStyle: TextFieldStyle {
+        func _body(configuration: TextField<Self._Label>) -> some View {
+            configuration
+                .padding()
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(Color(UIColor.systemGray4), lineWidth: 1)
+                }
+        }
+    }
+    
+    struct OutlinedTextFieldStyleIcon: TextFieldStyle {
+        
+        @State var icon: Image?
+        
+        func _body(configuration: TextField<Self._Label>) -> some View {
+            HStack {
+                if icon != nil {
+                    icon
+                        .foregroundColor(Color(UIColor.systemGray4))
+                }
+                configuration
+            }
+            .padding()
+            .overlay {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Color(UIColor.systemGray4), lineWidth: 1)
+            }
+        }
+    }
     
     var body: some View {
         
-        VStack(alignment: .leading, spacing: 30) {
-            TextField("Título", text: $titulo, axis: .vertical)
-            TextField("Descrição", text: $descricao, axis: .vertical)
-            TextField("Valor", value: $valor, format: .currency(code: "BRL"))
-                .keyboardType(.decimalPad)
-            
-        }
-        .padding()
-        
-        HStack(spacing: 50){
-            Button("Cancelar") {
-                dismiss()
+        NavigationStack{
+            VStack(spacing: 24) {
+                TextField("Título", text: $titulo, axis: .vertical)
+                    .textFieldStyle(OutlinedTextFieldStyle())
+                    .previewLayout(.sizeThatFits)
+                    
+                
+                TextField("Descrição", text: $descricao, axis: .vertical)
+                    .textFieldStyle(OutlinedTextFieldStyle())
+                    .previewLayout(.sizeThatFits)
+                    
+                
+                TextField("Valor", value: $valor, format: .currency(code: "BRL"))
+                    .keyboardType(.decimalPad)
+                    .textFieldStyle(OutlinedTextFieldStyleIcon())
+                    .previewLayout(.sizeThatFits)
+                
+                Spacer()
+                
             }
-            .foregroundStyle(.red)
-            Button("Salvar") {
-                let newOperacao = Financas(valor: valor, titulo: titulo, descricao: descricao, categoria: "Teste", ganho: true)
-                    operacoes.append(newOperacao)
-                    dismiss()
+            .padding()
+            .navigationTitle("Adicionar Transação")
+            .navigationBarTitleDisplayMode(.inline)
+            .autocorrectionDisabled(true)
+            .padding()
+            .toolbar {
+                
+                ToolbarItem(placement: .cancellationAction){
+                    Button(role: .close) {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction){
+                    
+                    Button(role: .confirm) {
+                        let newOperacao = Financas(valor: valor, titulo: titulo.trimmingCharacters(in: .whitespaces), descricao: descricao.trimmingCharacters(in: .whitespaces), categoria: "Teste", ganho: true)
+                            operacoes.append(newOperacao)
+                            dismiss()
+                    }
+                    .disabled(!formValido)
+                }
             }
-            .disabled(!formValido) // Desabilita o botão se formValido for false
-        }
 
+        }
     }
 }
 
@@ -113,4 +164,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+    
 }
