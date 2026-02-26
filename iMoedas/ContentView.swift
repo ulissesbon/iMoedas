@@ -137,7 +137,7 @@ struct ContentView: View {
                                     .font(.subheadline)
                             }
                             .swipeActions(edge: .trailing) {
-                                deleteAction()
+                                deleteAction(operacao.id)
                                 editAction()
                             }
                             
@@ -162,9 +162,9 @@ struct ContentView: View {
         }
         
     }
-    private func deleteAction() -> some View {
+    private func deleteAction(_ operacaoId: Financas.ID) -> some View {
         Button(role: .destructive) {
-            // Handle delete action
+            operacoes.removeAll(where: {$0.id == operacaoId})
         } label: {
             VStack {
                 Image(systemName: "wrongwaysign.fill")
