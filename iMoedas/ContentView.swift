@@ -24,10 +24,10 @@ struct CriarNovaOperacao: View {
     @State private var valor: Float = 0
     
     var formValido: Bool {
-           // Verifica se não está vazio e se não é apenas espaços
-           !titulo.trimmingCharacters(in: .whitespaces).isEmpty
-           && valor != 0
-       }
+        // Verifica se não está vazio e se não é apenas espaços
+        !titulo.trimmingCharacters(in: .whitespaces).isEmpty
+        && valor != 0
+    }
     
     struct OutlinedTextFieldStyle: TextFieldStyle {
         func _body(configuration: TextField<Self._Label>) -> some View {
@@ -67,12 +67,12 @@ struct CriarNovaOperacao: View {
                 TextField("Título", text: $titulo, axis: .vertical)
                     .textFieldStyle(OutlinedTextFieldStyle())
                     .previewLayout(.sizeThatFits)
-                    
+                
                 
                 TextField("Descrição", text: $descricao, axis: .vertical)
                     .textFieldStyle(OutlinedTextFieldStyle())
                     .previewLayout(.sizeThatFits)
-                    
+                
                 
                 TextField("Valor", value: $valor, format: .currency(code: "BRL"))
                     .keyboardType(.decimalPad)
@@ -98,13 +98,13 @@ struct CriarNovaOperacao: View {
                     
                     Button(role: .confirm) {
                         let newOperacao = Financas(valor: valor, titulo: titulo.trimmingCharacters(in: .whitespaces), descricao: descricao.trimmingCharacters(in: .whitespaces), categoria: "Teste", ganho: true)
-                            operacoes.append(newOperacao)
-                            dismiss()
+                        operacoes.append(newOperacao)
+                        dismiss()
                     }
                     .disabled(!formValido)
                 }
             }
-
+            
         }
     }
 }
@@ -136,6 +136,10 @@ struct ContentView: View {
                                 Text("\(operacao.descricao)")
                                     .font(.subheadline)
                             }
+                            .swipeActions(edge: .trailing) {
+                                deleteAction()
+                                editAction()
+                            }
                             
                         }
                     }
@@ -146,17 +150,39 @@ struct ContentView: View {
             }
             .navigationTitle(Text("iMoedas"))
             .toolbar {
-                    Button {
-                      criarNovaOperacao = true
-                    } label: {
-                      Image(systemName: "plus.circle.fill")
-                    }
-                  }
-                  .sheet(isPresented: $criarNovaOperacao) {
-                    CriarNovaOperacao(operacoes: $operacoes)
-                  }
+                Button {
+                    criarNovaOperacao = true
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                }
+            }
+            .sheet(isPresented: $criarNovaOperacao) {
+                CriarNovaOperacao(operacoes: $operacoes)
+            }
         }
         
+    }
+    private func deleteAction() -> some View {
+        Button(role: .destructive) {
+            // Handle delete action
+        } label: {
+            VStack {
+                Image(systemName: "wrongwaysign.fill")
+                Text("Delete")
+            }
+        }
+        .tint(.red)
+    }
+    private func editAction() -> some View {
+        Button {
+            // Handle edit action
+        } label: {
+            VStack {
+                Image(systemName: "note.text")
+                Text("Edit")
+            }
+        }
+        .tint(Color(red: 255/255, green: 128/255, blue: 0/255))
     }
 }
 
