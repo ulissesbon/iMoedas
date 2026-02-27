@@ -13,7 +13,7 @@ struct Financas: Identifiable {
     var observacao: String
     var categoria: String
     var entrada: Bool = false
-    //    var data : Date
+    var data : Date
 }
 
 struct CriarNovaOperacao: View {
@@ -28,7 +28,17 @@ struct CriarNovaOperacao: View {
     
     //private let categorias: [String] = ["Alimentação", "Trabalho", "Lazer", "Transporte", "Outros"]
     
-    
+////    var test = false
+//    var dates: [Date] {
+//        Set(operacoes.map(\.data)).sorted()
+//    }
+//    var operacoesIsEmpty: Bool {
+//        
+//        if operacoes.isEmpty {
+//            return true
+//        }
+//        return false
+//    }
     
     var formValido: Bool {
         // Verifica se não está vazio e se não é apenas espaços
@@ -67,67 +77,86 @@ struct CriarNovaOperacao: View {
         }
     }
     
-    @State var selected: String = ""
+    @State var selected: String = "Saída"
     
 
     var body: some View {
         let entradaOptions = [ "Entrada", "Saída"]
         
         NavigationStack{
-            VStack(spacing: 24) {
-                TextField("Título", text: $titulo, axis: .vertical)
-                    .textFieldStyle(OutlinedTextFieldStyle())
-                    .previewLayout(.sizeThatFits)
+            List {
                 
+                VStack(alignment: .leading, spacing: 12) {
                 
-                TextField("Valor", value: $valor, format: .currency(code: "BRL"))
-                    .keyboardType(.decimalPad)
-                    .textFieldStyle(OutlinedTextFieldStyleIcon())
-                    .previewLayout(.sizeThatFits)
-                
-                Picker("",
-                       selection: $selected,
-                       content: {
-                    ForEach(entradaOptions, id: \.self) {
-                        Text($0)
+                    Section("Título") {
+                        TextField("Ex: Compra de livros", text: $titulo, axis: .vertical)
+                            .textFieldStyle(OutlinedTextFieldStyle())
+                            .previewLayout(.sizeThatFits)
                     }
-                }
-                
-                ).pickerStyle(.segmented)
-
-                
-                TextField("Observações (Opcional)", text: $observacao, axis: .vertical)
-                    .textFieldStyle(OutlinedTextFieldStyle())
-                    .previewLayout(.sizeThatFits)
-                
-                Spacer()
-                
-            }
-            .padding()
-            .navigationTitle("Adicionar Transação")
-            .navigationBarTitleDisplayMode(.inline)
-            .autocorrectionDisabled(true)
-            .padding()
-            .toolbar {
-                
-                ToolbarItem(placement: .cancellationAction){
-                    Button(role: .close) {
-                        dismiss()
+                   
+                    
+                    Section("Valor") {
+                        TextField("Valor", value: $valor, format: .currency(code: "BRL"))
+                            .keyboardType(.decimalPad)
+                            .textFieldStyle(OutlinedTextFieldStyleIcon())
+                            .previewLayout(.sizeThatFits)
                     }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .confirm) {
+                    Spacer()
+                    
+                    Picker("Selecione a operação",
+                           selection: $selected){
+                        ForEach(entradaOptions, id: \.self) {
+                            Text($0)
+                        }
                         
-                        entrada = (selected == "Entrada") ? true : false
-                        valor = (entrada == true) ? valor : -valor
-                        
-                        let newOperacao = Financas(valor: valor, titulo: titulo.trimmingCharacters(in: .whitespaces), observacao: observacao.trimmingCharacters(in: .whitespaces), categoria: "Teste", entrada: entrada)
-                        operacoes.append(newOperacao)
-                        dismiss()
                     }
-                    .disabled(!formValido)
+                    .pickerStyle(.menu)
+                    
+                    Spacer()
+                    
+                    
+                    DatePicker(selection: $data, in: ...Date.now, displayedComponents: .date) {
+                        Text("Selecione a Data")
+                    }
+                    Spacer()
+                    
+                    Section("Observações") {
+                        TextField("Observações (Opcional)", text: $observacao, axis: .vertical)
+                            .textFieldStyle(OutlinedTextFieldStyle())
+                            .previewLayout(.sizeThatFits)
+                    }
+                    Spacer()
+                    
+                    
                 }
+                .navigationTitle("Adicionar Transação")
+                .navigationBarTitleDisplayMode(.inline)
+                .autocorrectionDisabled(true)
+                .padding()
+                .toolbar {
+                    
+                    ToolbarItem(placement: .cancellationAction){
+                        Button(role: .close) {
+                            dismiss()
+                        }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(role: .confirm) {
+                            
+                            entrada = (selected == "Entrada") ? true : false
+                            valor = (entrada == true) ? valor : -valor
+                            
+                            let newOperacao = Financas(valor: valor, titulo: titulo.trimmingCharacters(in: .whitespaces), observacao: observacao.trimmingCharacters(in: .whitespaces), categoria: "Teste", entrada: entrada, data: data)
+                            operacoes.append(newOperacao)
+                            dismiss()
+                        }
+                        .disabled(!formValido)
+                    }
+                }
+                .listSectionSeparator(.hidden)
             }
+            .listStyle(.plain)
+            
             
         }
     }
@@ -208,7 +237,7 @@ struct EditarOperacao: View {
                 ToolbarItem(placement: .confirmationAction){
                     
                     Button(role: .confirm) {
-                        let newOperacao = Financas(valor: valor, titulo: titulo.trimmingCharacters(in: .whitespaces), observacao: descricao.trimmingCharacters(in: .whitespaces), categoria: "Teste", entrada: true)
+                        let newOperacao = Financas(valor: valor, titulo: titulo.trimmingCharacters(in: .whitespaces), observacao: descricao.trimmingCharacters(in: .whitespaces), categoria: "Teste", entrada: true, data: Date())
                         operacoes.append(newOperacao)
                         dismiss()
                     }
@@ -221,31 +250,45 @@ struct EditarOperacao: View {
 
 struct ContentView: View {
     @State private var operacoes : [Financas] = [
-        Financas(valor: 100, titulo: "Concurso de Dança", observacao: "1º lugar na categoria de bailar", categoria: "Lazer", entrada: true),
-        Financas(valor: -50, titulo: "Almoço", observacao: "Mucei", categoria: "Alimentação", entrada: false)
+        Financas(valor: 100, titulo: "Concurso de Dança", observacao: "1º lugar na categoria de bailar", categoria: "Lazer", entrada: true, data: Date()),
+        Financas(valor: -50, titulo: "Almoço", observacao: "Mucei", categoria: "Alimentação", entrada: false, data: Date())
     ]
     
     @State private var criarNovaOperacao = false
     @State private var editSheet = false
+    
+    let dateFormatter: DateFormatter = { //Formatação da data
+            let formatter = DateFormatter()
+            formatter.dateStyle = .long
+            return formatter
+        }()
     
     var body: some View {
         NavigationStack {
             ZStack{
                 if operacoes.count != 0 {
                     List {
+                        
                         ForEach(operacoes) { operacao in
                             
-                            VStack(alignment: .leading){
+                            VStack(alignment: .leading, spacing: 6){
                                 LabeledContent {
                                     Text("\(operacao.valor, specifier: "%.2f")")
                                         .font(.subheadline)
-                                        .foregroundColor(operacao.entrada ? Color.green : Color.red)
+                                        .bold()
+                                        .foregroundColor(operacao.entrada ? Color(red: 0/255, green: 137/255, blue: 50/255) : Color.red)
                                 } label: {
                                     Text("\(operacao.titulo)")
+                                        .bold()
                                     
                                 }
                                 Text("\(operacao.observacao)")
                                     .font(.subheadline)
+                                
+                                Text("\(operacao.data, formatter: dateFormatter)")
+                                    .font(Font.subheadline.italic())
+                                    .foregroundColor(Color.gray)
+
                             }
                             .swipeActions(edge: .trailing) {
                                 deleteAction(operacao.id)
