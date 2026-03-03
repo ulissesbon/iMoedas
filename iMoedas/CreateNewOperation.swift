@@ -8,23 +8,23 @@
 import SwiftUI
 
 struct CreateNewOperation: View {
-    @Binding var operacoes: [Finances]
+    @Binding var operations: [Finances]
     
     @Environment(\.dismiss) var dismiss
     @State private var cashEntry: Bool = false
     @State private var title: String = ""
     @State private var observation: String = ""
-    @State private var valor: Float = 0
-    @State private var data: Date = Date()
+    @State private var value: Float = 0
+    @State private var operationDate: Date = Date()
     
     //private let categorias: [String] = ["Alimentação", "Trabalho", "Lazer", "Transporte", "Outros"]
     
 
     
-    var formValido: Bool {
+    var validForm: Bool {
         // Verifica se não está vazio e se não é apenas espaços
         !title.trimmingCharacters(in: .whitespaces).isEmpty
-        && valor != 0
+        && value != 0
     }
     
     struct OutlinedTextFieldStyle: TextFieldStyle {
@@ -62,7 +62,7 @@ struct CreateNewOperation: View {
     
 
     var body: some View {
-        let entradaOptions = [ "Entrada", "Saída"]
+        let entryOptions = [ "Entrada", "Saída"]
         
         NavigationStack{
             List {
@@ -77,7 +77,7 @@ struct CreateNewOperation: View {
                    
                     
                     Section("Valor") {
-                        TextField("Valor", value: $valor, format: .currency(code: "BRL"))
+                        TextField("Valor", value: $value, format: .currency(code: "BRL"))
                             .keyboardType(.decimalPad)
                             .textFieldStyle(OutlinedTextFieldStyleIcon())
                             .previewLayout(.sizeThatFits)
@@ -86,7 +86,7 @@ struct CreateNewOperation: View {
                     
                     Picker("Selecione a operação",
                            selection: $selected){
-                        ForEach(entradaOptions, id: \.self) {
+                        ForEach(entryOptions, id: \.self) {
                             Text($0)
                         }
                         
@@ -97,7 +97,7 @@ struct CreateNewOperation: View {
                     Spacer()
                     
                     
-                    DatePicker(selection: $data, in: ...Date.now, displayedComponents: .date) {
+                    DatePicker(selection: $operationDate, in: ...Date.now, displayedComponents: .date) {
                         Text("Selecione a Data")
                     }
                     Spacer()
@@ -127,11 +127,11 @@ struct CreateNewOperation: View {
                             
                             cashEntry = (selected == "Entrada") ? true : false
                             
-                            let newOperacao = Finances(value: valor, title: title.trimmingCharacters(in: .whitespaces), observation: observation.trimmingCharacters(in: .whitespaces), category: "Teste", cashEntry: cashEntry, operationDate: data)
-                            operacoes.append(newOperacao)
+                            let newOperation = Finances(value: value, title: title.trimmingCharacters(in: .whitespaces), observation: observation.trimmingCharacters(in: .whitespaces), category: "Teste", cashEntry: cashEntry, operationDate: operationDate)
+                            operations.append(newOperation)
                             dismiss()
                         }
-                        .disabled(!formValido)
+                        .disabled(!validForm)
                     }
                 }
                 .listSectionSeparator(.hidden)

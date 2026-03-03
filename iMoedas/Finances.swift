@@ -36,10 +36,10 @@ import SwiftData
 
 struct Finances: Identifiable {
     let id = UUID()
-    var valor: Float
-    var titulo: String
-    var observacao: String
-    var categoria: String
-    var entrada: Bool = false
-    var data : Date
+    var value: Float
+    var title: String
+    var observation: String
+    var category: String
+    var cashEntry: Bool = false
+    var operationDate : Date
 }
