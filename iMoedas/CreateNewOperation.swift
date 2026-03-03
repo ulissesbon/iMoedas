@@ -1,30 +1,29 @@
-struct CriarNovaOperacao: View {
-    @Binding var operacoes: [Financas]
+//
+//  CriarNovaOperacao.swift
+//  iMoedas
+//
+//  Created by User on 02/03/26.
+//
+
+import SwiftUI
+
+struct CreateNewOperation: View {
+    @Binding var operacoes: [Finances]
     
     @Environment(\.dismiss) var dismiss
-    @State private var entrada: Bool = false
-    @State private var titulo: String = ""
-    @State private var observacao: String = ""
+    @State private var cashEntry: Bool = false
+    @State private var title: String = ""
+    @State private var observation: String = ""
     @State private var valor: Float = 0
     @State private var data: Date = Date()
     
     //private let categorias: [String] = ["Alimentação", "Trabalho", "Lazer", "Transporte", "Outros"]
     
-////    var test = false
-//    var dates: [Date] {
-//        Set(operacoes.map(\.data)).sorted()
-//    }
-//    var operacoesIsEmpty: Bool {
-//        
-//        if operacoes.isEmpty {
-//            return true
-//        }
-//        return false
-//    }
+
     
     var formValido: Bool {
         // Verifica se não está vazio e se não é apenas espaços
-        !titulo.trimmingCharacters(in: .whitespaces).isEmpty
+        !title.trimmingCharacters(in: .whitespaces).isEmpty
         && valor != 0
     }
     
@@ -71,7 +70,7 @@ struct CriarNovaOperacao: View {
                 VStack(alignment: .leading, spacing: 12) {
                 
                     Section("Título") {
-                        TextField("Ex: Compra de livros", text: $titulo, axis: .vertical)
+                        TextField("Ex: Compra de livros", text: $title, axis: .vertical)
                             .textFieldStyle(OutlinedTextFieldStyle())
                             .previewLayout(.sizeThatFits)
                     }
@@ -93,6 +92,7 @@ struct CriarNovaOperacao: View {
                         
                     }
                     .pickerStyle(.menu)
+                    .tint(Color(.gray))
                     
                     Spacer()
                     
@@ -102,8 +102,8 @@ struct CriarNovaOperacao: View {
                     }
                     Spacer()
                     
-                    Section("Observações") {
-                        TextField("Observações (Opcional)", text: $observacao, axis: .vertical)
+                    Section("Observações (opcional") {
+                        TextField("Ex: Preciso encapar os livros", text: $observation, axis: .vertical)
                             .textFieldStyle(OutlinedTextFieldStyle())
                             .previewLayout(.sizeThatFits)
                     }
@@ -125,10 +125,9 @@ struct CriarNovaOperacao: View {
                     ToolbarItem(placement: .confirmationAction) {
                         Button(role: .confirm) {
                             
-                            entrada = (selected == "Entrada") ? true : false
-                            valor = (entrada == true) ? valor : -valor
+                            cashEntry = (selected == "Entrada") ? true : false
                             
-                            let newOperacao = Financas(valor: valor, titulo: titulo.trimmingCharacters(in: .whitespaces), observacao: observacao.trimmingCharacters(in: .whitespaces), categoria: "Teste", entrada: entrada, data: data)
+                            let newOperacao = Finances(value: valor, title: title.trimmingCharacters(in: .whitespaces), observation: observation.trimmingCharacters(in: .whitespaces), category: "Teste", cashEntry: cashEntry, operationDate: data)
                             operacoes.append(newOperacao)
                             dismiss()
                         }
