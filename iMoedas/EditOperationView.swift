@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
-struct EditarOperacao: View {
-    @Binding var operations: [Finances]
-    let editingOperation: Finances
+struct EditOperationView: View {
+
+    @Environment(\.dismiss) private var dismiss
+    var operation: Finances
     
-    @Environment(\.dismiss) var dismiss
     @State private var cashEntry: Bool = false
     @State private var title: String = ""
     @State private var observation: String = ""
@@ -185,5 +186,5 @@ struct EditarOperacao: View {
         cashEntry: true,
         operationDate: .init()
     )
-    EditarOperacao(operations: $operations, editingOperation: editingOperation)
+    EditOperationView(operations: $operations, editingOperation: editingOperation)
 }
