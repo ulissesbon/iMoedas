@@ -1,0 +1,1 @@
+OperationDetailView(operation: operation)
