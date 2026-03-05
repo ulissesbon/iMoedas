@@ -9,9 +9,10 @@ import SwiftUI
 import SwiftData
 
 struct EditOperationView: View {
-
+    
     @Environment(\.dismiss) private var dismiss
-    var operation: Finances
+    
+    var operation: Operation
     
     @State private var cashEntry: Bool = false
     @State private var title: String = ""
@@ -19,30 +20,31 @@ struct EditOperationView: View {
     @State private var value: Float = 0
     @State private var operationDate: Date = Date()
     
-    var validForm: Bool {
-        // Verifica se não está vazio e se não é apenas espaços.
-        
-        //&& !observacao.trimmingCharacters(in: .whitespaces).isEmpty
-        let first = !title.trimmingCharacters(in: .whitespaces).isEmpty
-        print("!titulo.trimmingCharacters(in: .whitespaces).isEmpty : \(first)")
-        
-        let second = value != 0
-        print("valor != 0 : \(second)")
-        
-        let third = title != editingOperation.title || value != editingOperation.value || cashEntry != editingOperation.cashEntry || operationDate != editingOperation.operationDate || observation != editingOperation.observation
-        print("Edição: \(third)")
-        
-        print("Resultado: \(first && second && third)")
-        
-        //Não pode salvar as alterações, caso não tenha feito alteração
-        return !title.trimmingCharacters(in: .whitespaces).isEmpty
-        && value != 0
-        && (title != editingOperation.title
-        || value != editingOperation.value
-        || cashEntry != editingOperation.cashEntry
-        || operationDate != editingOperation.operationDate
-        || observation != editingOperation.observation)
-    }
+    @State private var discardChanges = false
+    @State private var saveChanges = false
+    
+//    private func validFormFunc() -> Bool {
+//        cashEntry = (selected == "Entrada") ? true : false
+//        
+//        var validForm: Bool {
+//            // Verifica se não está vazio e se não é apenas espaços.
+//            
+//            //&& !observacao.trimmingCharacters(in: .whitespaces).isEmpty
+//            !title.trimmingCharacters(in: .whitespaces).isEmpty
+//            && value != 0
+//            
+//            //Não pode salvar as alterações, caso não tenha feito alteração
+//            && (
+//                title != operation.title ||
+//                value != operation.value ||
+//                cashEntry != operation.cashEntry ||
+//                operationDate != operation.operationDate ||
+//                observation != operation.observation
+//            )
+//        }
+//        return validForm
+//    }
+    
     
     struct OutlinedTextFieldStyle: TextFieldStyle {
         func _body(configuration: TextField<Self._Label>) -> some View {
@@ -133,58 +135,76 @@ struct EditOperationView: View {
                 .autocorrectionDisabled(true)
                 .padding()
                 .toolbar {
-                    
-                    ToolbarItem(placement: .cancellationAction){
-                        Button(role: .close) {
-                            dismiss()
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button(role: .cancel) {
+                            if !title.isEmpty || value == 0.0{
+                                discardChanges = true
+                            } else {
+                                dismiss()
+                            }
+                        }
+                        .confirmationDialog("Descartar alterações", isPresented: $discardChanges) {
+                            Button("Descartar", role: .destructive) {
+                                dismiss()
+                            }
+                        } message: {
+                            Text("Descartar alterações?")
                         }
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         Button(role: .confirm) {
+                            saveChanges = true
                             
-                            cashEntry = (selected == "Entrada") ? true : false
-                            
-                            if let indice = operations.firstIndex(where: { $0.id == editingOperation.id }){
-                                operations[indice].title = title.trimmingCharacters(in: .whitespaces)
-                                operations[indice].observation = observation
-                                operations[indice].value = value
-                                operations[indice].cashEntry = cashEntry
-                                operations[indice].operationDate = operationDate
-                            }
-                            dismiss()
                         }
-                        .disabled(!validForm) // TODO: logica para desabilitar
+                        .confirmationDialog("Salvar alterações", isPresented: $saveChanges) {
+                            Button("Salvar", role: .confirm) {
+                                save()
+                                dismiss()
+                            }
+                        } message: {
+                            Text("Salvar alterações?")
+                        }
+                       // .disabled(!(!title.trimmingCharacters(in: .whitespaces).isEmpty && value != 0))
                     }
                 }
                 .listSectionSeparator(.hidden)
             }
             .listStyle(.plain)
             .onAppear {
-                title = editingOperation.title
-                value = editingOperation.value
-                value = (value < 0) ? -value : value
-                cashEntry = editingOperation.cashEntry
-                observation = editingOperation.observation
-                operationDate = editingOperation.operationDate
-                selected = (editingOperation.cashEntry == true) ? "Entrada" : "Saída"
+                title = operation.title
+                value = operation.value
+                value = operation.value
+                cashEntry = operation.cashEntry
+                observation = operation.observation ?? ""
+                operationDate = operation.operationDate
+                selected = (operation.cashEntry == true) ? "Entrada" : "Saída"
             }
             
             
         }
     }
     
+    private func save() {
+        operation.title = title
+        operation.value = value
+        cashEntry = (selected == "Entrada") ? true : false
+        operation.cashEntry = cashEntry
+        operation.operationDate = operationDate
+        operation.observation = observation.isEmpty ? nil : observation
+    }
+    
 }
 
 
+
+
 #Preview {
-    @Previewable @State var operations: [Finances] = []
-    let editingOperation: Finances = .init(
-        value: 111,
-        title: "A",
-        observation: "B",
-        category: "C",
-        cashEntry: true,
-        operationDate: .init()
+    EditOperationView(
+        operation: Operation(
+            title: "Teste",
+            value: 88.99,
+            cashEntry: true,
+            operationDate: .init()
+        )
     )
-    EditOperationView(operations: $operations, editingOperation: editingOperation)
 }

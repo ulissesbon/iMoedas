@@ -5,17 +5,22 @@
 //
 
 import SwiftUI
+import SwiftData
+
+struct OperationsGroup: Identifiable {
+    let id = UUID()
+    let date: Date
+    let operations: [Operation]
+}
 
 struct ContentView: View {
-    @State private var operations : [Finances] = [
-        Finances(value: 100, title: "Concurso de Dança", observation: "1º lugar na categoria de bailar", category: "Lazer", cashEntry: true, operationDate: Date()),
-        Finances(value: 50, title: "Almoço", observation: "Almoço no restaurante favorito", category: "Alimentação", cashEntry: false, operationDate: Date())
-    ]
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \Operation.title) private var operations: [Operation]
     
     @State private var createOperationSheet = false
-    @State private var editOperationSheet = true
+    @State private var editOperationSheet = false
     
-    @State private var editingOperation: Finances? = nil
+    @State private var editingOperation: Operation? = nil
     
     let dateFormatter: DateFormatter = { //Formatação da data
         let formatter = DateFormatter()
@@ -24,109 +29,156 @@ struct ContentView: View {
         return formatter
     }()
     
+    //    let newOperation = Finances(title: "reste/", value: 88.99, cashEntry: true, operationDate: Date())
+    //    modelContext.insert(newOperation)
+    //
+    //    var dates: [Date] {
+    //        Set(operations.map(\.operationDate)).sorted()
+    //    }
     
-//    var dates: [Date] {
-//        Set(operations.map(\.operationDate)).sorted()
-//    }
+    
+    func groupedOperations() -> [OperationsGroup] {
+        let operationsByDay = Dictionary(grouping: operations, by: { Calendar.current.startOfDay(for: $0.operationDate)  })
+        return operationsByDay.map { (date, operations) in
+            OperationsGroup(date: date, operations: operations)
+        }
+    }
     
     var body: some View {
-//        Text("\(dates)")
+        //        Text("\(dates)")
         NavigationStack {
-            ZStack{
-                
-                if operations.count != 0 {
-                    List {
-                        
-                        ForEach(operations) { operation in
+        
+            
+            
+            
+            if !operations.isEmpty {
+                List {
+//                    ForEach(groupedOperations()) { group in
+//                        Section("dia: \(group.date.formatted())") {
+////                            ForEach(group.operations) { <#Int#> in
+////                                <#code#>
+////                            }
+//                        }
+//                    }
+                    ForEach(operations) { operation in
+                        NavigationLink {
+                            OperationDetailView(operation: operation)
+                        } label: {
+                            Text("\(operation.title)")
+                                .bold()
                             
-                            VStack(alignment: .leading, spacing: 6){
-                                
-                                LabeledContent {
-                                    // Mostra o valor em verde se for entrada
-                                    if operation.cashEntry == true {
-                                        Text("R$\(operation.value, specifier: "%.2f")")
-                                            .font(.subheadline)
-                                            .bold()
-                                            .foregroundColor(Color(red: 0/255, green: 137/255, blue: 50/255))
-                                        
-                                    }
-                                    // Mostra o valor em vermelho e com negativo antes
-                                    else {
-                                        Text("-R$\(operation.value, specifier: "%.2f")")
-                                            .font(.subheadline)
-                                            .bold()
-                                            .foregroundColor(Color.red)
-                                        
-                                    }
-                                } label: {
-                                    Text("\(operation.title)")
-                                        .bold()
-                                    
-                                }
-                                Text("\(operation.observation)")
-                                    .font(.subheadline.italic().weight(.thin))
-                                
-                                Text("\(operation.operationDate, formatter: dateFormatter)")
-                                    .font(Font.subheadline.italic())
-                                    .foregroundColor(Color.gray)
+//                            if operation.observation != "" {
+//                                Text("\(operation.observation)")
+//                                    .font(.subheadline.italic().weight(.thin))
+//                            }
+                            
+                            Text("\(operation.operationDate, formatter: dateFormatter)")
+                                .font(Font.subheadline.italic())
+                                .foregroundColor(Color.gray)
+                            
+                            if operation.cashEntry == true {
+                                Text("R$\(operation.value, specifier: "%.2f")")
+                                    .font(.subheadline)
+                                    .bold()
+                                    .foregroundColor(Color(red: 0/255, green: 137/255, blue: 50/255))
                                 
                             }
-                            .swipeActions(edge: .trailing) {
-                                deleteAction(operation.id)
-                                editAction(operation)
+                            // Mostra o valor em vermelho e com negativo antes
+                            else {
+                                Text("-R$\(operation.value, specifier: "%.2f")")
+                                    .font(.subheadline)
+                                    .bold()
+                                    .foregroundColor(Color.red)
+                                
                             }
                             
                         }
+                        
+                    }
+                    .onDelete { offsets in
+                        for index in offsets {
+                            let operation = operations[index]
+                            modelContext.delete(operation)
+                        }
                     }
                 }
-                else {
-                    ContentUnavailableView("Sem histórico de operações. Clique no ícone + para começar.", systemImage: "brazilianrealsign.circle.fill")
+                .navigationTitle(Text("Saldo"))
+                .toolbar {
+                    Button {
+                        createOperationSheet = true
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                    }
                 }
-            }
-            .navigationTitle(Text("Histórico"))
-            .toolbar {
-                Button {
-                    createOperationSheet = true
-                } label: {
-                    Image(systemName: "plus.circle.fill")
+                .sheet(isPresented: $createOperationSheet) {
+                    CreateNewOperation()
                 }
+            } else {
+                ListEmptyView()
+                //ContentUnavailableView("Sem histórico de operações. Clique no ícone + para começar.", systemImage: "brazilianrealsign.circle.fill")
             }
-            .sheet(isPresented: $createOperationSheet) {
-                CreateNewOperation(operations: $operations)
-            }
-            .sheet(item: $editingOperation) { operation in
-                EditarOperacao(operations: $operations, editingOperation: operation)
-            }
+            
+            //                            else {
+            //                                ContentUnavailableView("Sem histórico de operações. Clique no ícone + para começar.", systemImage: "brazilianrealsign.circle.fill")
+            //                            }
+            
+            
+            
         }
-        
-    }
-    private func deleteAction(_ operationId: Finances.ID) -> some View {
-        Button(role: .destructive) {
-            operations.removeAll(where: {$0.id == operationId})
-        } label: {
-            VStack {
-                Image(systemName: "trash.fill")
-                Text("Excluir")
-            }
+        .onAppear {
+            let groups = groupedOperations()
+            print(groups.count)
         }
-        
-    }
-    private func editAction(_ operation: Finances) -> some View {
-        Button {
-            editingOperation = operation
-            //            editSheet = true
-        } label: {
-            VStack {
-                Image(systemName: "pencil")
-                Text("Editar")
-            }
-        }
-        .tint(Color(red: 255/255, green: 128/255, blue: 0/255))
     }
 }
 
 
 #Preview {
-    ContentView()
+    let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Operation.self, configurations: configuration)
+    
+    var operationCollection: [Operation] = [
+        Operation(
+            title: "Almoço",
+            value: 88.99,
+            cashEntry: false,
+            operationDate: .init()
+        ),
+        Operation(
+            title: "Salario",
+            value: 1250.00,
+            observation: "Salario do mês",
+            cashEntry: true,
+            operationDate: .init()
+        ),
+        Operation(
+            title: "Conserto carro",
+            value: 500.99,
+            cashEntry: false,
+            operationDate: .init()
+        ),
+        Operation(
+            title: "Freelancer",
+            value: 3000,
+            observation: "Desenvolvimento de site",
+            cashEntry: true,
+            operationDate: Date().addingTimeInterval(-86_400)
+        ),
+        Operation(
+            title: "Salgado",
+            value: 4.99,
+            cashEntry: false,
+            operationDate: Date().addingTimeInterval(2 * (-86_400))
+        )
+    ]
+    
+    for operation in operationCollection {
+        container.mainContext.insert(operation)
+    }
+    
+    
+    return ContentView()
+        .modelContainer(container)
+    
     
 }
