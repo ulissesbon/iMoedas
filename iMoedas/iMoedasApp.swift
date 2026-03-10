@@ -13,6 +13,7 @@ struct iMoedasApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-        }//.modelContainer(for: [Financas.self])
+        }
+        .modelContainer(for: [Operation.self])
     }
 }

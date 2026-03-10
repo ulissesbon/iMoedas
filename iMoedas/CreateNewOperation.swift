@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct CreateNewOperation: View {
-    @Binding var operations: [Finances]
+    @Environment(\.modelContext)
+    private var modelContext
     
     @Environment(\.dismiss) var dismiss
     @State private var cashEntry: Bool = false
@@ -127,8 +129,14 @@ struct CreateNewOperation: View {
                             
                             cashEntry = (selected == "Entrada") ? true : false
                             
-                            let newOperation = Finances(value: value, title: title.trimmingCharacters(in: .whitespaces), observation: observation.trimmingCharacters(in: .whitespaces), category: "Teste", cashEntry: cashEntry, operationDate: operationDate)
-                            operations.append(newOperation)
+                            let newOperation = Operation(
+                                title: title.trimmingCharacters(in: .whitespaces),
+                                value: value,
+                                observation: observation.trimmingCharacters(in: .whitespaces),
+                                cashEntry: cashEntry,
+                                operationDate: operationDate
+                            )
+                            modelContext.insert(newOperation)
                             dismiss()
                         }
                         .disabled(!validForm)
@@ -141,4 +149,8 @@ struct CreateNewOperation: View {
             
         }
     }
+}
+
+#Preview {
+    CreateNewOperation()
 }
