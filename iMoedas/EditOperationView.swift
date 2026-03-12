@@ -103,7 +103,7 @@ struct EditOperationView: View {
                     Spacer()
                     
                     
-                    Picker("Selecione a operação",
+                    Picker("Selecione o tipo",
                            selection: $selected ){
                         ForEach(entryOptions, id: \.self) {
                             Text($0)

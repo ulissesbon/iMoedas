@@ -9,6 +9,7 @@
 import SwiftUI
 import SwiftData
 
+
 struct OperationsGroupByDate: Identifiable {
     let id = UUID()
     let date: Date
@@ -37,6 +38,7 @@ struct ListOperationView: View {
             OperationsGroupByDate(date: date, operations: operations)
         }
     }
+
     
     func balanceCalc() -> Float {
         let balance: Float = operations.reduce(0) { $0 + ($1.cashEntry ? $1.value : -$1.value) }
@@ -50,11 +52,11 @@ struct ListOperationView: View {
     
     
     var body: some View {
+      
         NavigationStack {
             if !operations.isEmpty {
                 List {
                     Section {
-                        
                         HStack {
                             Text("Saldo")
                                 .font(.title2.bold())
@@ -68,11 +70,11 @@ struct ListOperationView: View {
                                     .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
                                 
                             } else {
-                                    Text("-R$\(balanceCalc() * -1, specifier: "%.2f")")
-                                        .font(.title3)
-                                        .bold()
-                                        .foregroundColor(Color.red)
-                                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
+                                Text("-R$\(balanceCalc() * -1, specifier: "%.2f")")
+                                    .font(.title3)
+                                    .bold()
+                                    .foregroundColor(Color.red)
+                                    .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
                             }
                             Spacer()
                         }
@@ -108,10 +110,11 @@ struct ListOperationView: View {
                                     .foregroundColor(Color.red)
                                     .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .center))
                                 
-                                    
+                                
                             }
                         }
                     }
+
                     
                     Section {
                     }
@@ -140,6 +143,7 @@ struct ListOperationView: View {
                                             .foregroundColor(Color.gray)
                                             .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .center))
                                     }
+
                                     
                                     if operation.cashEntry == true {
                                         Text("R$\(operation.value, specifier: "%.2f")")
@@ -168,8 +172,10 @@ struct ListOperationView: View {
                             modelContext.delete(operation)
                         }
                     }
+
                 }
                 .listSectionSpacing(10)
+
                 .toolbar {
                     Button {
                         createOperationSheet = true
@@ -201,6 +207,7 @@ struct ListOperationView: View {
         }
         .onAppear {
             let groups = groupedByDateOperations()
+
             print(groups.count)
         }
     }
