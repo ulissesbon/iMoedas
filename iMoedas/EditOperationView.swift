@@ -121,8 +121,8 @@ struct EditOperationView: View {
                     }
                     Spacer()
                     
-                    Section("Observações") {
-                        TextField("Observações (Opcional)", text: $observation, axis: .vertical)
+                    Section("Observações (Opcional)") {
+                        TextField("Ex: Preciso encapar os livros", text: $observation, axis: .vertical)
                             .textFieldStyle(OutlinedTextFieldStyle())
                             .previewLayout(.sizeThatFits)
                     }
