@@ -2,7 +2,7 @@
 //  iMoedasApp.swift
 //  iMoedas
 //
-//  Created by User on 24/02/26.
+//  Created by Sure & Ulisses on 24/02/26.
 //
 
 import SwiftUI

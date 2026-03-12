@@ -2,7 +2,7 @@
 //  Financas.swift
 //  iMoedas
 //
-//  Created by User on 02/03/26.
+//  Created by Sure & Ulisses on 02/03/26.
 //
 import SwiftUI
 import SwiftData

@@ -2,7 +2,7 @@
 //  OperationDetailView.swift
 //  iMoedas
 //
-//  Created by User on 04/03/26.
+//  Created by Sure & Ulisses on 04/03/26.
 //
 import SwiftData
 import SwiftUI

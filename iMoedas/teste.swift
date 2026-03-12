@@ -2,7 +2,7 @@
 //  teste.swift
 //  iMoedas
 //
-//  Created by User on 03/03/26.
+//  Created by Sure & Ulisses on 03/03/26.
 //
 
 import SwiftUI
