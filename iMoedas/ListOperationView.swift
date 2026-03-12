@@ -113,10 +113,15 @@ struct ListOperationView: View {
                         }
                     }
                     
-                    // TODO: consertar a aparência de histórico para um título
-                    Section("Histórico") {
+                    Section {
                     }
-                    .padding(4)
+                    header:
+                    { Text("Histórico")
+                            .textCase(nil)
+                            .font(.title)
+                            .bold()
+                            .foregroundColor(Color.black)
+                    }
                     
                     // Código da divisão/section por datas
                     ForEach(groupedByDateOperations()) { group in
