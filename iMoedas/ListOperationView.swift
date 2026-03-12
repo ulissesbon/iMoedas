@@ -9,11 +9,11 @@
 import SwiftUI
 import SwiftData
 
-//struct OperationsGroup: Identifiable {
-//    let id = UUID()
-//    let date: Date
-//    let operations: [Operation]
-//}
+struct OperationsGroup: Identifiable {
+    let id = UUID()
+    let date: Date
+    let operations: [Operation]
+}
 
 struct ListOperationView: View {
     @Environment(\.modelContext) private var modelContext
@@ -31,20 +31,18 @@ struct ListOperationView: View {
         return formatter
     }()
     
-    //    let newOperation = Finances(title: "reste/", value: 88.99, cashEntry: true, operationDate: Date())
-    //    modelContext.insert(newOperation)
-    //
-    //    var dates: [Date] {
-    //        Set(operations.map(\.operationDate)).sorted()
-    //    }
     
+    var dates: [Date] {
+        Set(operations.map(\.operationDate)).sorted()
+    }
     
-//    func groupedOperations() -> [OperationsGroup] {
-//        let operationsByDay = Dictionary(grouping: operations, by: { Calendar.current.startOfDay(for: $0.operationDate)  })
-//        return operationsByDay.map { (date, operations) in
-//            OperationsGroup(date: date, operations: operations)
-//        }
-//    }
+    func groupedOperations() -> [OperationsGroup] {
+        let operationsByDay = Dictionary(grouping: operations, by: { Calendar.current.startOfDay(for: $0.operationDate)  })
+        return operationsByDay.map { (date, operations) in
+            OperationsGroup(date: date, operations: operations)
+        }
+    }
+    
     
     func balanceCalc() -> Float {
         let balance: Float = operations.reduce(0) { $0 + ($1.cashEntry ? $1.value : -$1.value) }
@@ -58,16 +56,11 @@ struct ListOperationView: View {
     
     
     var body: some View {
-        //        Text("\(dates)")
+       // Text("\(dates)")
         NavigationStack {
-        
-            
-            
-            
             if !operations.isEmpty {
                 List {
                     Section {
-                        
                         HStack {
                             Text("Saldo")
                                 .font(.title2.bold())
@@ -81,11 +74,11 @@ struct ListOperationView: View {
                                     .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
                                 
                             } else {
-                                    Text("-R$\(balanceCalc() * -1, specifier: "%.2f")")
-                                        .font(.title3)
-                                        .bold()
-                                        .foregroundColor(Color.red)
-                                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
+                                Text("-R$\(balanceCalc() * -1, specifier: "%.2f")")
+                                    .font(.title3)
+                                    .bold()
+                                    .foregroundColor(Color.red)
+                                    .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
                             }
                             Spacer()
                         }
@@ -121,24 +114,25 @@ struct ListOperationView: View {
                                     .foregroundColor(Color.red)
                                     .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .center))
                                 
-                                    
+                                
                             }
                         }
                     }
-//                    .listSectionSpacing(0)
-
+                    .listSectionSpacing(6)
+                    
                     
                     //Código da divisão/section por datas
-//                    ForEach(groupedOperations()) { group in
+                   // ForEach(groupedOperations()) { group in
 //                        Section("dia: \(group.date.formatted())") {
-//                            ForEach(group.operations) { <#Int#> in
-//                                <#code#>
+//                            ForEach(group.operations) { date in
+//                                group.date == date.operationDate
 //                            }
 //                        }
 //                    }
                     
                     Section("Histórico") {
                         
+                                
                         ForEach(operations) { operation in
                             
                             NavigationLink {
@@ -183,11 +177,10 @@ struct ListOperationView: View {
                             }
                         }
                     }
-//                    .listSectionSpacing(0)
                     .padding(4)
                 }
                 .listSectionSpacing(10)
-
+                
                 .toolbar {
                     Button {
                         createOperationSheet = true
@@ -217,10 +210,10 @@ struct ListOperationView: View {
             
             
         }
-//        .onAppear {
-//            let groups = groupedOperations()
-//            print(groups.count)
-//        }
+        .onAppear {
+            let groups = groupedOperations()
+            print(groups.count)
+        }
     }
 }
 
