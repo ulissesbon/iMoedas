@@ -86,7 +86,7 @@ struct CreateNewOperation: View {
                     }
                     Spacer()
                     
-                    Picker("Selecione a operação",
+                    Picker("Selecione o tipo",
                            selection: $selected){
                         ForEach(entryOptions, id: \.self) {
                             Text($0)
@@ -104,7 +104,7 @@ struct CreateNewOperation: View {
                     }
                     Spacer()
                     
-                    Section("Observações (opcional") {
+                    Section("Observações (opcional)") {
                         TextField("Ex: Preciso encapar os livros", text: $observation, axis: .vertical)
                             .textFieldStyle(OutlinedTextFieldStyle())
                             .previewLayout(.sizeThatFits)
@@ -113,7 +113,7 @@ struct CreateNewOperation: View {
                     
                     
                 }
-                .navigationTitle("Adicionar Operacao")
+                .navigationTitle("Adicionar Operação")
                 .navigationBarTitleDisplayMode(.inline)
                 .autocorrectionDisabled(true)
                 .padding()

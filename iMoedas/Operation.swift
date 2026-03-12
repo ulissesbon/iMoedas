@@ -30,12 +30,3 @@ class Operation {
     }
 }
 
-//struct Finances: Identifiable {
-//    let id = UUID()
-//    var value: Float
-//    var title: String
-//    var observation: String
-//    var category: String
-//    var cashEntry: Bool = false
-//    var operationDate : Date
-//}

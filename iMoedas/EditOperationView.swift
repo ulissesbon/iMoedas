@@ -103,7 +103,7 @@ struct EditOperationView: View {
                     Spacer()
                     
                     
-                    Picker("Selecione a operação",
+                    Picker("Selecione o tipo",
                            selection: $selected ){
                         ForEach(entryOptions, id: \.self) {
                             Text($0)
@@ -121,8 +121,8 @@ struct EditOperationView: View {
                     }
                     Spacer()
                     
-                    Section("Observações") {
-                        TextField("Observações (Opcional)", text: $observation, axis: .vertical)
+                    Section("Observações (Opcional)") {
+                        TextField("Ex: Preciso encapar os livros", text: $observation, axis: .vertical)
                             .textFieldStyle(OutlinedTextFieldStyle())
                             .previewLayout(.sizeThatFits)
                     }
