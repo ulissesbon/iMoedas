@@ -31,14 +31,14 @@ struct ListOperationView: View {
         formatter.dateStyle = .medium
         return formatter
     }()
-
+    
     func groupedByDateOperations() -> [OperationsGroupByDate] {
         let operationsByDay = Dictionary(grouping: operations, by: { Calendar.current.startOfDay(for: $0.operationDate)  })
         return operationsByDay.map { (date, operations) in
             OperationsGroupByDate(date: date, operations: operations)
         }
     }
-
+    
     
     func balanceCalc() -> Float {
         let balance: Float = operations.reduce(0) { $0 + ($1.cashEntry ? $1.value : -$1.value) }
@@ -52,7 +52,7 @@ struct ListOperationView: View {
     
     
     var body: some View {
-      
+        
         NavigationStack {
             if !operations.isEmpty {
                 List {
@@ -114,17 +114,12 @@ struct ListOperationView: View {
                             }
                         }
                     }
-
                     
-                    Section {
-                    }
-                    header:
-                    { Text("Histórico")
-                            .textCase(nil)
-                            .font(.title)
-                            .bold()
-                            .foregroundColor(Color.black)
-                    }
+                    Text("Histórico")
+                        .font(.title)
+                        .bold()
+                        .listRowBackground(Color.clear)
+                        .offset(y: 18)
                     
                     // Código da divisão/section por datas
                     ForEach(groupedByDateOperations()) { group in
@@ -143,7 +138,7 @@ struct ListOperationView: View {
                                             .foregroundColor(Color.gray)
                                             .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .center))
                                     }
-
+                                    
                                     
                                     if operation.cashEntry == true {
                                         Text("R$\(operation.value, specifier: "%.2f")")
@@ -172,10 +167,10 @@ struct ListOperationView: View {
                             modelContext.delete(operation)
                         }
                     }
-
+                    
                 }
                 .listSectionSpacing(10)
-
+                
                 .toolbar {
                     Button {
                         createOperationSheet = true
@@ -207,7 +202,7 @@ struct ListOperationView: View {
         }
         .onAppear {
             let groups = groupedByDateOperations()
-
+            
             print(groups.count)
         }
     }
