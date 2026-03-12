@@ -9,11 +9,11 @@
 import SwiftUI
 import SwiftData
 
-//struct OperationsGroup: Identifiable {
-//    let id = UUID()
-//    let date: Date
-//    let operations: [Operation]
-//}
+struct OperationsGroupByDate: Identifiable {
+    let id = UUID()
+    let date: Date
+    let operations: [Operation]
+}
 
 struct ListOperationView: View {
     @Environment(\.modelContext) private var modelContext
@@ -30,21 +30,13 @@ struct ListOperationView: View {
         formatter.dateStyle = .medium
         return formatter
     }()
-    
-    //    let newOperation = Finances(title: "reste/", value: 88.99, cashEntry: true, operationDate: Date())
-    //    modelContext.insert(newOperation)
-    //
-    //    var dates: [Date] {
-    //        Set(operations.map(\.operationDate)).sorted()
-    //    }
-    
-    
-//    func groupedOperations() -> [OperationsGroup] {
-//        let operationsByDay = Dictionary(grouping: operations, by: { Calendar.current.startOfDay(for: $0.operationDate)  })
-//        return operationsByDay.map { (date, operations) in
-//            OperationsGroup(date: date, operations: operations)
-//        }
-//    }
+
+    func groupedByDateOperations() -> [OperationsGroupByDate] {
+        let operationsByDay = Dictionary(grouping: operations, by: { Calendar.current.startOfDay(for: $0.operationDate)  })
+        return operationsByDay.map { (date, operations) in
+            OperationsGroupByDate(date: date, operations: operations)
+        }
+    }
     
     func balanceCalc() -> Float {
         let balance: Float = operations.reduce(0) { $0 + ($1.cashEntry ? $1.value : -$1.value) }
@@ -58,12 +50,7 @@ struct ListOperationView: View {
     
     
     var body: some View {
-        //        Text("\(dates)")
         NavigationStack {
-        
-            
-            
-            
             if !operations.isEmpty {
                 List {
                     Section {
@@ -125,70 +112,59 @@ struct ListOperationView: View {
                             }
                         }
                     }
-//                    .listSectionSpacing(0)
-
                     
-                    //Código da divisão/section por datas
-//                    ForEach(groupedOperations()) { group in
-//                        Section("dia: \(group.date.formatted())") {
-//                            ForEach(group.operations) { <#Int#> in
-//                                <#code#>
-//                            }
-//                        }
-//                    }
-                    
+                    // TODO: consertar a aparência de histórico para um título
                     Section("Histórico") {
-                        
-                        ForEach(operations) { operation in
-                            
-                            NavigationLink {
-                                OperationDetailView(operation: operation)
-                            } label: {
-                                VStack{
-                                    Text("\(operation.title)")
-                                        .bold()
-                                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .center))
+                    }
+                    .padding(4)
+                    
+                    // Código da divisão/section por datas
+                    ForEach(groupedByDateOperations()) { group in
+                        Section ("\(group.date, formatter: dateFormatter)") {
+                            ForEach(group.operations) { operation in
+                                NavigationLink {
+                                    OperationDetailView(operation: operation)
+                                } label: {
+                                    VStack{
+                                        Text("\(operation.title)")
+                                            .bold()
+                                            .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .center))
+                                        
+                                        Text("\(operation.operationDate, formatter: dateFormatter)")
+                                            .font(Font.subheadline.italic())
+                                            .foregroundColor(Color.gray)
+                                            .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .center))
+                                    }
                                     
-                                    Text("\(operation.operationDate, formatter: dateFormatter)")
-                                        .font(Font.subheadline.italic())
-                                        .foregroundColor(Color.gray)
-                                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .center))
-                                }
-                                
-                                if operation.cashEntry == true {
-                                    Text("R$\(operation.value, specifier: "%.2f")")
-                                        .font(.subheadline)
-                                        .foregroundColor(Color(red: 0/255, green: 137/255, blue: 50/255))
-                                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
+                                    if operation.cashEntry == true {
+                                        Text("R$\(operation.value, specifier: "%.2f")")
+                                            .font(.subheadline)
+                                            .foregroundColor(Color(red: 0/255, green: 137/255, blue: 50/255))
+                                            .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
+                                        
+                                    }
+                                    // Mostra o valor em vermelho e com negativo antes
+                                    else {
+                                        Text("-R$\(operation.value, specifier: "%.2f")")
+                                            .font(.subheadline)
+                                            .foregroundColor(Color.red)
+                                            .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
+                                        
+                                    }
                                     
                                 }
-                                // Mostra o valor em vermelho e com negativo antes
-                                else {
-                                    Text("-R$\(operation.value, specifier: "%.2f")")
-                                        .font(.subheadline)
-                                        .foregroundColor(Color.red)
-                                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .trailing, vertical: .center))
-                                    
-                                }
-                                
                             }
-                            
-                            
                         }
                         
-                        .onDelete { offsets in
-                            for index in offsets {
-                                let operation = operations[index]
-                                modelContext.delete(operation)
-                            }
+                    }
+                    .onDelete { offsets in
+                        for index in offsets {
+                            let operation = operations[index]
+                            modelContext.delete(operation)
                         }
                     }
-//                    .listSectionSpacing(0)
-                    .padding(4)
                 }
-
                 .listSectionSpacing(10)
-
                 .toolbar {
                     Button {
                         createOperationSheet = true
@@ -218,10 +194,10 @@ struct ListOperationView: View {
             
             
         }
-//        .onAppear {
-//            let groups = groupedOperations()
-//            print(groups.count)
-//        }
+        .onAppear {
+            let groups = groupedByDateOperations()
+            print(groups.count)
+        }
     }
 }
 
