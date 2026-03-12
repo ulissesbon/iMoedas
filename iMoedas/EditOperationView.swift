@@ -12,40 +12,17 @@ struct EditOperationView: View {
     
     @Environment(\.dismiss) private var dismiss
     
-    var operation: Operation
-    
-    @State private var cashEntry: Bool = false
-    @State private var title: String = ""
-    @State private var observation: String = ""
-    @State private var value: Float = 0
     @State private var operationDate: Date = Date()
-    
+    @State private var observation: String = ""
+    @State private var cashEntry: Bool = false
     @State private var discardChanges = false
     @State private var saveChanges = false
+    @State private var title: String = ""
+    @State private var value: Float = 0
     
-//    private func validFormFunc() -> Bool {
-//        cashEntry = (selected == "Entrada") ? true : false
-//        
-//        var validForm: Bool {
-//            // Verifica se não está vazio e se não é apenas espaços.
-//            
-//            //&& !observacao.trimmingCharacters(in: .whitespaces).isEmpty
-//            !title.trimmingCharacters(in: .whitespaces).isEmpty
-//            && value != 0
-//            
-//            //Não pode salvar as alterações, caso não tenha feito alteração
-//            && (
-//                title != operation.title ||
-//                value != operation.value ||
-//                cashEntry != operation.cashEntry ||
-//                operationDate != operation.operationDate ||
-//                observation != operation.observation
-//            )
-//        }
-//        return validForm
-//    }
+    var operation: Operation
     
-    
+
     struct OutlinedTextFieldStyle: TextFieldStyle {
         func _body(configuration: TextField<Self._Label>) -> some View {
             configuration
@@ -93,7 +70,6 @@ struct EditOperationView: View {
                             .previewLayout(.sizeThatFits)
                     }
                     
-                    
                     Section("Valor") {
                         TextField("Valor", value: $value, format: .currency(code: "BRL"))
                             .keyboardType(.decimalPad)
@@ -102,23 +78,20 @@ struct EditOperationView: View {
                     }
                     Spacer()
                     
-                    
-                    Picker("Selecione o tipo",
-                           selection: $selected ){
+                    Picker("Selecione o tipo", selection: $selected ){
                         ForEach(entryOptions, id: \.self) {
                             Text($0)
                         }
-                        
                     }
-                           .pickerStyle(.menu)
-                           .tint(Color(.gray))
+                   .pickerStyle(.menu)
+                   .tint(Color(.gray))
                     
                     Spacer()
-                    
                     
                     DatePicker(selection: $operationDate, in: ...Date.now, displayedComponents: .date) {
                         Text("Selecione a Data")
                     }
+                    
                     Spacer()
                     
                     Section("Observações (Opcional)") {
@@ -126,8 +99,8 @@ struct EditOperationView: View {
                             .textFieldStyle(OutlinedTextFieldStyle())
                             .previewLayout(.sizeThatFits)
                     }
-                    Spacer()
                     
+                    Spacer()
                     
                 }
                 .navigationTitle("Editar Operação")
@@ -154,7 +127,6 @@ struct EditOperationView: View {
                     ToolbarItem(placement: .confirmationAction) {
                         Button(role: .confirm) {
                             saveChanges = true
-                            
                         }
                         .confirmationDialog("Salvar alterações", isPresented: $saveChanges) {
                             Button("Salvar", role: .confirm) {
@@ -164,7 +136,6 @@ struct EditOperationView: View {
                         } message: {
                             Text("Salvar alterações?")
                         }
-                       // .disabled(!(!title.trimmingCharacters(in: .whitespaces).isEmpty && value != 0))
                     }
                 }
                 .listSectionSeparator(.hidden)
@@ -179,8 +150,6 @@ struct EditOperationView: View {
                 operationDate = operation.operationDate
                 selected = (operation.cashEntry == true) ? "Entrada" : "Saída"
             }
-            
-            
         }
     }
     
@@ -192,10 +161,7 @@ struct EditOperationView: View {
         operation.operationDate = operationDate
         operation.observation = observation.isEmpty ? nil : observation
     }
-    
 }
-
-
 
 
 #Preview {

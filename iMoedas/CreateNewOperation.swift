@@ -9,19 +9,15 @@ import SwiftUI
 import SwiftData
 
 struct CreateNewOperation: View {
-    @Environment(\.modelContext)
-    private var modelContext
-    
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) var dismiss
+    
+    @State private var operationDate: Date = Date()
+    @State private var observation: String = ""
     @State private var cashEntry: Bool = false
     @State private var title: String = ""
-    @State private var observation: String = ""
     @State private var value: Float = 0
-    @State private var operationDate: Date = Date()
-    
-    //private let categorias: [String] = ["Alimentação", "Trabalho", "Lazer", "Transporte", "Outros"]
-    
-
+    @State var selected: String = "Saída"
     
     var validForm: Bool {
         // Verifica se não está vazio e se não é apenas espaços
@@ -60,9 +56,6 @@ struct CreateNewOperation: View {
         }
     }
     
-    @State var selected: String = "Saída"
-    
-
     var body: some View {
         let entryOptions = [ "Entrada", "Saída"]
         
@@ -70,13 +63,12 @@ struct CreateNewOperation: View {
             List {
                 
                 VStack(alignment: .leading, spacing: 12) {
-                
+                    
                     Section("Título") {
                         TextField("Ex: Compra de livros", text: $title, axis: .vertical)
                             .textFieldStyle(OutlinedTextFieldStyle())
                             .previewLayout(.sizeThatFits)
                     }
-                   
                     
                     Section("Valor") {
                         TextField("Valor", value: $value, format: .currency(code: "BRL"))
@@ -84,6 +76,7 @@ struct CreateNewOperation: View {
                             .textFieldStyle(OutlinedTextFieldStyleIcon())
                             .previewLayout(.sizeThatFits)
                     }
+                    
                     Spacer()
                     
                     Picker("Selecione o tipo",
@@ -93,15 +86,15 @@ struct CreateNewOperation: View {
                         }
                         
                     }
-                    .pickerStyle(.menu)
-                    .tint(Color(.gray))
+                           .pickerStyle(.menu)
+                           .tint(Color(.gray))
                     
                     Spacer()
-                    
                     
                     DatePicker(selection: $operationDate, in: ...Date.now, displayedComponents: .date) {
                         Text("Selecione a Data")
                     }
+                    
                     Spacer()
                     
                     Section("Observações (opcional)") {
@@ -109,8 +102,8 @@ struct CreateNewOperation: View {
                             .textFieldStyle(OutlinedTextFieldStyle())
                             .previewLayout(.sizeThatFits)
                     }
-                    Spacer()
                     
+                    Spacer()
                     
                 }
                 .navigationTitle("Adicionar Operação")
@@ -145,8 +138,6 @@ struct CreateNewOperation: View {
                 .listSectionSeparator(.hidden)
             }
             .listStyle(.plain)
-            
-            
         }
     }
 }

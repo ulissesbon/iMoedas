@@ -20,10 +20,9 @@ struct ListOperationView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Operation.operationDate, order: .reverse) private var operations: [Operation]
     
+    @State private var editingOperation: Operation? = nil
     @State private var createOperationSheet = false
     @State private var editOperationSheet = false
-    
-    @State private var editingOperation: Operation? = nil
     
     let dateFormatter: DateFormatter = { //Formatação da data
         let formatter = DateFormatter()
@@ -109,8 +108,6 @@ struct ListOperationView: View {
                                     .font(.title3)
                                     .foregroundColor(Color.red)
                                     .frame(maxWidth: .infinity, alignment: .init(horizontal: .leading, vertical: .center))
-                                
-                                
                             }
                         }
                     }
@@ -170,7 +167,6 @@ struct ListOperationView: View {
                     
                 }
                 .listSectionSpacing(10)
-                
                 .toolbar {
                     Button {
                         createOperationSheet = true
@@ -197,8 +193,6 @@ struct ListOperationView: View {
                     CreateNewOperation()
                 }
             }
-            
-            
         }
         .onAppear {
             let groups = groupedByDateOperations()
