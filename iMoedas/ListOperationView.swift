@@ -17,7 +17,7 @@ import SwiftData
 
 struct ListOperationView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Operation.title) private var operations: [Operation]
+    @Query(sort: \Operation.operationDate, order: .reverse) private var operations: [Operation]
     
     @State private var createOperationSheet = false
     @State private var editOperationSheet = false
@@ -186,6 +186,7 @@ struct ListOperationView: View {
 //                    .listSectionSpacing(0)
                     .padding(4)
                 }
+
                 .listSectionSpacing(10)
 
                 .toolbar {
